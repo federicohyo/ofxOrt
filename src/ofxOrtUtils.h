@@ -143,8 +143,22 @@ public:
     }
     return images;
   }
+  
+  static void softmax(float *input, const size_t inputLen) {
+      const float maxVal = *std::max_element(input, input + inputLen);
 
-  static void ofxOrtUtils::softmax(float *input, const size_t inputLen) {
+      const float sum = std::accumulate(input, input + inputLen, 0.0,
+                                        [&](float a, const float b) {
+                                          return std::move(a) + expf(b - maxVal);
+                                        });
+
+      const float offset = maxVal + logf(sum);
+      for (auto it = input; it != (input + inputLen); ++it) {
+        *it = expf(*it - offset);
+      }
+  }
+  
+/*  static void ofxOrtUtils::softmax(float *input, const size_t inputLen) {
     const float maxVal = *std::max_element(input, input + inputLen);
 
     const float sum = std::accumulate(input, input + inputLen, 0.0,
@@ -157,8 +171,8 @@ public:
       *it = expf(*it - offset);
     }
   }
-
-  static float ofxOrtUtils::sigmoid(const float x) {
+*/
+  static float sigmoid(const float x) {
     return 1.0 / (1.0 + expf(-x));
   }
 
